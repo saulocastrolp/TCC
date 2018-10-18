@@ -70,17 +70,17 @@ fecha_nominais = " }\n"
 ### Cabeçalho do ARFF ###
 ref_arquivo_arrf.write("@RELATION historico_cot_diario\n\n")
 
-ref_arquivo_arrf.write("@ATTRIBUTE data_pregao date \"yyyy-MM-dd HH:mm:ss\"\n")
-ref_arquivo_arrf.write("@ATTRIBUTE cod_bdi numeric\n")
-ref_arquivo_arrf.write("@ATTRIBUTE cod_negociacao " + cod_neg + fecha_nominais)
-ref_arquivo_arrf.write("@ATTRIBUTE tipo_mercado " + tp_merc + fecha_nominais)
+ref_arquivo_arrf.write("@ATTRIBUTE 'data_pregao' date \"yyyy-MM-dd HH:mm:ss\"\n")
+ref_arquivo_arrf.write("@ATTRIBUTE 'cod_bdi' numeric\n")
+#ref_arquivo_arrf.write("@ATTRIBUTE 'cod_negociacao' " + cod_neg + fecha_nominais)
+ref_arquivo_arrf.write("@ATTRIBUTE 'tipo_mercado' " + tp_merc + fecha_nominais)
 #ref_arquivo_arrf.write("@ATTRIBUTE nome_papel " + nom_res + fecha_nominais)
-ref_arquivo_arrf.write("@ATTRIBUTE especificacao_papel " + especi + fecha_nominais)
-ref_arquivo_arrf.write("@ATTRIBUTE prazo_mercado_termo numeric\n")
+ref_arquivo_arrf.write("@ATTRIBUTE 'especificacao_papel' " + especi + fecha_nominais)
+ref_arquivo_arrf.write("@ATTRIBUTE 'prazo_mercado_termo' REAL\n")
 #ref_arquivo_arrf.write("@ATTRIBUTE preco_abertura numeric\n")
 #ref_arquivo_arrf.write("@ATTRIBUTE preco_maximo numeric\n")
 #ref_arquivo_arrf.write("@ATTRIBUTE preco_minimo numeric\n")
-ref_arquivo_arrf.write("@ATTRIBUTE preco_medio numeric\n")
+ref_arquivo_arrf.write("@ATTRIBUTE 'preco_medio' REAL\n")
 #ref_arquivo_arrf.write("@ATTRIBUTE preco_ultima_neg numeric\n")
 #ref_arquivo_arrf.write("@ATTRIBUTE preco_oferta_compra numeric\n")
 #ref_arquivo_arrf.write("@ATTRIBUTE preco_oferta_venda numeric\n")
@@ -90,6 +90,7 @@ ref_arquivo_arrf.write("@ATTRIBUTE preco_medio numeric\n")
 #ref_arquivo_arrf.write("@ATTRIBUTE indicador_correcao numeric\n")
 #ref_arquivo_arrf.write("@ATTRIBUTE cod_papel " + cod_isi + fecha_nominais)
 #ref_arquivo_arrf.write("@ATTRIBUTE numero_distribuicao numeric\n\n")
+ref_arquivo_arrf.write("@ATTRIBUTE 'cod_negociacao' " + cod_neg + fecha_nominais)
 ref_arquivo_arrf.write("@DATA\n")
 ref_arquivo_arrf.write("\n")
 
@@ -136,7 +137,7 @@ for l in ref_arquivo:
         ref_arquivo_arrf.write("\"" \
             + data_pregao + "\", " \
             + cod_bdi + ", " \
-            + "'" + cod_neg + "', " \
+            #+ "'" + cod_neg + "', " \
             + tp_merc + ", " \
             #+ "'" + nom_res + "'" + ", " \
             + "'" + especi + "', " \
@@ -144,7 +145,8 @@ for l in ref_arquivo:
             #+ preco_aber + ", " \
             #+ preco_max + ", " \
             #+ preco_min + ", " \
-            + preco_med + "\n")
+            + preco_med + "," \
+            + "'" + cod_neg + "\n")
             #+ preco_ult + ", " \
             #+ preco_oft_c + ", " \
             #+ preco_oft_v + ", " \
