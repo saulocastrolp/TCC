@@ -38,7 +38,9 @@ cod_isi         = "{"        # CODISI - CÓDIGO DO PAPEL NO SISTEMA ISIN OU CÓD
 ### Recolhendo valores nominais ###
 tam_arq = ref_arquivo.readlines()
 count = len(tam_arq)
+print "Separando dados nominais..."
 for l in tam_arq:
+    
     if (count < len(tam_arq)):
         add = "," if count > 1 else ""
 
@@ -102,7 +104,7 @@ for l in ref_arquivo:
         cod_origem = l[15:23]      # CODIGO DA ORIGEM
         dt_ger_arq = l[23:31]      # DATA DA GERAÇÃO DO ARQUIVO
         reserva = l[31:245]        # RESERVA
-        print(tipo_reg, nome_arq, cod_origem, dt_ger_arq, reserva)
+        print("Iniciando preprocessamento do arquivo: " + nome_arq)
     ### Inicio dos descritivos dos dados aqui cruciais ###
     elif tipo_reg == '01':
         data_pregao     = formDt(l[2:10].strip())          # DATA DO PREGÃO
@@ -111,7 +113,7 @@ for l in ref_arquivo:
         tp_merc         = l[24:27].strip()                 # TPMERC - TIPO DE MERCADO
         nom_res         = l[27:39].strip()                 # NOMRES - NOME RESUMIDO DA EMPRESA EMISSORA DO PAPEL
         especi          = l[39:49].strip()                 # ESPECI - ESPECIFICAÇÃO DO PAPEL
-        prazo_merctermo = l[49:52].strip()                 # PRAZOT - PRAZO EM DIAS DO MERCADO A TERMO
+        prazo_merctermo = str(int(l[49:52].strip())) if  l[49:52].strip() != '' else str(0)              # PRAZOT - PRAZO EM DIAS DO MERCADO A TERMO
         mod_ref         = l[52:56].strip()                          # MODREF - MOEDA DE REFERÊNCIA
         preco_aber      = str(float(l[56:69].strip()) / 100)        # PREABE - PREÇO DE ABERTURA DO PAPEL- MERCADO NO PREGÃO
         preco_max       = str(float(l[69:82].strip()) / 100)        # PREMAX - PREÇO MÁXIMO DO PAPEL- MERCADO NO PREGÃO
@@ -132,17 +134,17 @@ for l in ref_arquivo:
         dis_med         = l[242:245].strip()        # DISMES - NÚMERO DE DISTRIBUIÇÃO DO PAPEL
 
         ref_arquivo_arrf.write("\"" \
-            + data_pregao + "\"" + ", " \
+            + data_pregao + "\", " \
             + cod_bdi + ", " \
-            + "'" + cod_neg + "'" + ", " \
+            + "'" + cod_neg + "', " \
             + tp_merc + ", " \
             #+ "'" + nom_res + "'" + ", " \
-            + "'" + especi + "'" + ", " \
-            + "'" + prazo_merctermo + "'" + ", " \
+            + "'" + especi + "', " \
+            + prazo_merctermo + ", " \
             #+ preco_aber + ", " \
             #+ preco_max + ", " \
             #+ preco_min + ", " \
-            + preco_med \
+            + preco_med + "\n")
             #+ preco_ult + ", " \
             #+ preco_oft_c + ", " \
             #+ preco_oft_v + ", " \
@@ -151,8 +153,7 @@ for l in ref_arquivo:
             #+ vol_neg_tot + ", " \
             #+ ind_opc + ", " \
             #+ "'" + cod_isi + "'" + ", " \
-            #+ dis_med 
-            + "\n")
+            #+ dis_med + "\n")
 
     ### Cabeçalho para arquivo de reserva (Desnecessário para o Proposto) ###  
     elif tipo_reg == '99':
@@ -166,5 +167,6 @@ for l in ref_arquivo:
         break
 
 ### Fechando os arquivos ###
+print "Finalizado!"
 ref_arquivo.close()
 ref_arquivo_arrf.close()
