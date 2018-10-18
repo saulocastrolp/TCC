@@ -1,16 +1,23 @@
-i = 8;
-ref_arquivo_concatenado = open("cot_hist_2008_a_2016.txt","w")
+# -*- coding: utf-8 -*-
 
-while i <= 16 :
-     
-    if i <= 9 :
-        arq_name = "COTAHIST_A200" + str(i) + ".TXT"
-    else :
-        arq_name = "COTAHIST_A20" + str(i) + ".TXT"
-    ref_arquivo = open(arq_name,"r")
-    linha = ref_arquivo.readline()
-    while linha :
-        ref_arquivo_concatenado.write(linha)
-        linha = ref_arquivo.readline()
-    ref_arquivo.close()
-    i += 1
+def concatenaArq(init_year, end_year):
+    arq_name_concat = "cot_hist_" + init_year + "_a_" + end_year + ".txt"
+    ref_arquivo_concatenado = open(arq_name_concat,"w")
+
+    count = int(init_year)
+
+    load = "."
+
+    while count <= int(end_year) :
+        load += "."
+        print load
+
+        arq_name = "DadosBrutosporAno/COTAHIST_A" + str(count) + ".TXT"
+
+        ref_arquivo = open(arq_name,"r")
+        for linha in ref_arquivo:
+            ref_arquivo_concatenado.write(linha)
+        ref_arquivo.close()
+        count += 1
+    ref_arquivo_concatenado.close()
+    return arq_name_concat

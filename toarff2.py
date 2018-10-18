@@ -1,23 +1,28 @@
 # -*- coding: utf-8 -*-
+import concatena_arq
 import argparse
 
 parser = argparse.ArgumentParser(description = 'Conversor de txt de dados históricos para arff para uso no WEKA.')
-parser.add_argument('--arqe', action = 'store', dest = 'arqe',
-                           default = 'cot_hist_2008_a_2018.txt', required = False,
-                           help = 'arquivo de entrada em txt.')
-parser.add_argument('--arqs', action = 'store', dest = 'arqs',
-                           default = 'cot_hist_2008_a_2018.arff', required = False,
-                           help = 'arquivo de saida em arff.')
+parser.add_argument('--init_year', action = 'store', dest = 'init_year',
+                           default = '2008', required = False,
+                           help = 'ano inicial a se considerar.')
+parser.add_argument('--end_year', action = 'store', dest = 'end_year',
+                           default = '2018', required = False,
+                           help = 'limite de anos a serem considerados.')
 parser.add_argument('--limit', action = 'store', dest = 'limite',
-                           default = 5000, required = False,
+                           default = None, required = False,
                            help = 'limite de linhas a serem convertidas.')
 arguments = parser.parse_args()
 
-limite = int(arguments.limite)
+limite = int(arguments.limite) if arguments.limite else None
+init_year = arguments.init_year
+end_year = arguments.end_year
 
 ### Declaração dos arquivos que seram utilizados ###
-arq_entrada = arguments.arqe
-arq_saida = arguments.arqs
+print "Concatenando arquivos txt. Aguarde!"
+arq_entrada = concatena_arq.concatenaArq(init_year, end_year)
+print arq_entrada
+arq_saida = arq_entrada.split('.')[0] + '.arff'
 ref_arquivo = open(arq_entrada,"r")
 ref_arquivo_arrf = open(arq_saida,"w")
 
@@ -50,7 +55,7 @@ for l in tam_arq:
 
     count -= 1
     countLinhas += 1
-    if (countLinhas == limite):
+    if (limite and countLinhas == limite):
         break
 ref_arquivo.close()
 ref_arquivo = open(arq_entrada,"r")
@@ -67,21 +72,22 @@ ref_arquivo_arrf.write("@ATTRIBUTE data_pregao date \"yyyy-MM-dd HH:mm:ss\"\n")
 ref_arquivo_arrf.write("@ATTRIBUTE cod_bdi numeric\n")
 ref_arquivo_arrf.write("@ATTRIBUTE cod_negociacao " + cod_neg + fecha_nominais)
 ref_arquivo_arrf.write("@ATTRIBUTE tipo_mercado " + tp_merc + fecha_nominais)
-ref_arquivo_arrf.write("@ATTRIBUTE nome_papel " + nom_res + fecha_nominais)
+#ref_arquivo_arrf.write("@ATTRIBUTE nome_papel " + nom_res + fecha_nominais)
 ref_arquivo_arrf.write("@ATTRIBUTE especificacao_papel " + especi + fecha_nominais)
-ref_arquivo_arrf.write("@ATTRIBUTE preco_abertura numeric\n")
-ref_arquivo_arrf.write("@ATTRIBUTE preco_maximo numeric\n")
-ref_arquivo_arrf.write("@ATTRIBUTE preco_minimo numeric\n")
+ref_arquivo_arrf.write("@ATTRIBUTE prazo_mercado_termo numeric\n")
+#ref_arquivo_arrf.write("@ATTRIBUTE preco_abertura numeric\n")
+#ref_arquivo_arrf.write("@ATTRIBUTE preco_maximo numeric\n")
+#ref_arquivo_arrf.write("@ATTRIBUTE preco_minimo numeric\n")
 ref_arquivo_arrf.write("@ATTRIBUTE preco_medio numeric\n")
-ref_arquivo_arrf.write("@ATTRIBUTE preco_ultima_neg numeric\n")
-ref_arquivo_arrf.write("@ATTRIBUTE preco_oferta_compra numeric\n")
-ref_arquivo_arrf.write("@ATTRIBUTE preco_oferta_venda numeric\n")
-ref_arquivo_arrf.write("@ATTRIBUTE negocios_efetuados numeric\n")
-ref_arquivo_arrf.write("@ATTRIBUTE total_negociado numeric\n")
-ref_arquivo_arrf.write("@ATTRIBUTE volume_total numeric\n")
-ref_arquivo_arrf.write("@ATTRIBUTE indicador_correcao numeric\n")
-ref_arquivo_arrf.write("@ATTRIBUTE cod_papel " + cod_isi + fecha_nominais)
-ref_arquivo_arrf.write("@ATTRIBUTE numero_distribuicao numeric\n\n")
+#ref_arquivo_arrf.write("@ATTRIBUTE preco_ultima_neg numeric\n")
+#ref_arquivo_arrf.write("@ATTRIBUTE preco_oferta_compra numeric\n")
+#ref_arquivo_arrf.write("@ATTRIBUTE preco_oferta_venda numeric\n")
+#ref_arquivo_arrf.write("@ATTRIBUTE negocios_efetuados numeric\n")
+#ref_arquivo_arrf.write("@ATTRIBUTE total_negociado numeric\n")
+#ref_arquivo_arrf.write("@ATTRIBUTE volume_total numeric\n")
+#ref_arquivo_arrf.write("@ATTRIBUTE indicador_correcao numeric\n")
+#ref_arquivo_arrf.write("@ATTRIBUTE cod_papel " + cod_isi + fecha_nominais)
+#ref_arquivo_arrf.write("@ATTRIBUTE numero_distribuicao numeric\n\n")
 ref_arquivo_arrf.write("@DATA\n")
 ref_arquivo_arrf.write("\n")
 
@@ -105,6 +111,7 @@ for l in ref_arquivo:
         tp_merc         = l[24:27].strip()                 # TPMERC - TIPO DE MERCADO
         nom_res         = l[27:39].strip()                 # NOMRES - NOME RESUMIDO DA EMPRESA EMISSORA DO PAPEL
         especi          = l[39:49].strip()                 # ESPECI - ESPECIFICAÇÃO DO PAPEL
+        prazo_merctermo = l[49:52].strip()                 # PRAZOT - PRAZO EM DIAS DO MERCADO A TERMO
         mod_ref         = l[52:56].strip()                          # MODREF - MOEDA DE REFERÊNCIA
         preco_aber      = str(float(l[56:69].strip()) / 100)        # PREABE - PREÇO DE ABERTURA DO PAPEL- MERCADO NO PREGÃO
         preco_max       = str(float(l[69:82].strip()) / 100)        # PREMAX - PREÇO MÁXIMO DO PAPEL- MERCADO NO PREGÃO
@@ -129,21 +136,23 @@ for l in ref_arquivo:
             + cod_bdi + ", " \
             + "'" + cod_neg + "'" + ", " \
             + tp_merc + ", " \
-            + "'" + nom_res + "'" + ", " \
+            #+ "'" + nom_res + "'" + ", " \
             + "'" + especi + "'" + ", " \
-            + preco_aber + ", " \
-            + preco_max + ", " \
-            + preco_min + ", " \
-            + preco_med + ", " \
-            + preco_ult + ", " \
-            + preco_oft_c + ", " \
-            + preco_oft_v + ", " \
-            + tot_neg + ", " \
-            + qtd_neg_tot + ", " \
-            + vol_neg_tot + ", " \
-            + ind_opc + ", " \
-            + "'" + cod_isi + "'" + ", " \
-            + dis_med + "\n")
+            + "'" + prazo_merctermo + "'" + ", " \
+            #+ preco_aber + ", " \
+            #+ preco_max + ", " \
+            #+ preco_min + ", " \
+            + preco_med \
+            #+ preco_ult + ", " \
+            #+ preco_oft_c + ", " \
+            #+ preco_oft_v + ", " \
+            #+ tot_neg + ", " \
+            #+ qtd_neg_tot + ", " \
+            #+ vol_neg_tot + ", " \
+            #+ ind_opc + ", " \
+            #+ "'" + cod_isi + "'" + ", " \
+            #+ dis_med 
+            + "\n")
 
     ### Cabeçalho para arquivo de reserva (Desnecessário para o Proposto) ###  
     elif tipo_reg == '99':
@@ -153,7 +162,7 @@ for l in ref_arquivo:
 	    total_reg = l[31:42]       # TOTAL DE REGISTROS
 	    reserva = l[42:245]        # RESERVA
     countLinhas += 1
-    if (countLinhas == limite):
+    if (limite and countLinhas == limite):
         break
 
 ### Fechando os arquivos ###
